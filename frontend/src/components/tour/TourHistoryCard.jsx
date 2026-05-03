@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Star } from "lucide-react";
 
 const GRADIENTS = [
-  "linear-gradient(135deg, #1C3325 0%, #2d5a40 100%)",
-  "linear-gradient(135deg, #D96B42 0%, #b85530 100%)",
-  "linear-gradient(135deg, #4a7a60 0%, #1C3325 100%)",
-  "linear-gradient(135deg, #8B5E3C 0%, #D99C42 100%)",
-  "linear-gradient(135deg, #2d4a6a 0%, #1C3325 100%)",
-  "linear-gradient(135deg, #6B4226 0%, #D96B42 100%)",
+  "linear-gradient(135deg, #0F5132 0%, #16A34A 100%)",
+  "linear-gradient(135deg, #E8580A 0%, #C24A08 100%)",
+  "linear-gradient(135deg, #0E7490 0%, #0891B2 100%)",
+  "linear-gradient(135deg, #B45309 0%, #D97706 100%)",
+  "linear-gradient(135deg, #1D4ED8 0%, #3B82F6 100%)",
+  "linear-gradient(135deg, #7C3AED 0%, #9333EA 100%)",
 ];
 
 const fmt = (amount) =>
@@ -67,7 +67,7 @@ const TourHistoryCard = ({ plan, index }) => {
               <span
                 key={i}
                 className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full"
-                style={{ background: "#F2ECE4", color: "#4A5A50" }}
+                style={{ background: "#E8F4FB", color: "#0E7490" }}
               >
                 <Star size={9} fill="#D99C42" stroke="#D99C42" />
                 {h}
@@ -79,13 +79,13 @@ const TourHistoryCard = ({ plan, index }) => {
         {/* Costs */}
         <div
           className="rounded-xl p-3 mb-4 space-y-2"
-          style={{ background: "#FAF9F6", border: "1px solid #E5DFD3" }}
+          style={{ background: "#FDF6EE", border: "1px solid #E0D4C0" }}
         >
           <div className="flex justify-between items-center">
             <span className="text-xs" style={{ color: "#75837A" }}>Premium Plan</span>
             <span
               className="text-sm font-bold"
-              style={{ color: "#1C3325", fontFamily: "Outfit, sans-serif" }}
+              style={{ color: "#0C3D20", fontFamily: "Outfit, sans-serif" }}
               data-testid={`card-premium-${plan.plan_id}`}
             >
               {fmt(plan.premium_total)}
@@ -95,7 +95,7 @@ const TourHistoryCard = ({ plan, index }) => {
             <span className="text-xs" style={{ color: "#75837A" }}>Budget Plan</span>
             <span
               className="text-sm font-bold"
-              style={{ color: "#D96B42", fontFamily: "Outfit, sans-serif" }}
+              style={{ color: "#E8580A", fontFamily: "Outfit, sans-serif" }}
               data-testid={`card-budget-${plan.plan_id}`}
             >
               {fmt(plan.budget_total)}

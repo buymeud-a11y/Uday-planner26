@@ -56,18 +56,18 @@ const PlanCard = ({ plan, destination, duration, type }) => {
   if (!plan) return null;
   const isPremium = type === "premium";
 
-  const cardBg = isPremium ? "#1C3325" : "#FFFFFF";
+  const cardBg = isPremium ? "#0C3D20" : "#FFFFFF";
   const textPrimary = isPremium ? "#FFFFFF" : "#1C3325";
-  const textSecondary = isPremium ? "rgba(255,255,255,0.75)" : "#4A5A50";
-  const tagBg = isPremium ? "rgba(255,255,255,0.12)" : "#F2ECE4";
-  const tagText = isPremium ? "#fff" : "#4A5A50";
-  const sectionBg = isPremium ? "rgba(255,255,255,0.06)" : "#FAF9F6";
-  const borderColor = isPremium ? "rgba(255,255,255,0.1)" : "#E5DFD3";
+  const textSecondary = isPremium ? "rgba(255,255,255,0.78)" : "#4A5A50";
+  const tagBg = isPremium ? "rgba(255,255,255,0.14)" : "#E8F4FB";
+  const tagText = isPremium ? "#fff" : "#0E7490";
+  const sectionBg = isPremium ? "rgba(255,255,255,0.07)" : "#FDF6EE";
+  const borderColor = isPremium ? "rgba(255,255,255,0.12)" : "#E0D4C0";
 
   return (
     <section
       className="py-16 px-4"
-      style={{ background: isPremium ? "#F2ECE4" : "#FAF9F6" }}
+      style={{ background: isPremium ? "#EDE0CC" : "#FDF6EE" }}
       data-testid={`plan-section-${type}`}
     >
       <div className="max-w-5xl mx-auto">
@@ -224,13 +224,13 @@ const PlanCard = ({ plan, destination, duration, type }) => {
           {/* Grand Total */}
           <div
             className="mt-8 rounded-2xl p-6 text-center"
-            style={{ background: isPremium ? "rgba(217,107,66,0.15)" : "#1C3325", border: isPremium ? "1px solid rgba(217,107,66,0.3)" : "none" }}
+            style={{ background: isPremium ? "rgba(232,88,10,0.18)" : "#0C3D20", border: isPremium ? "1px solid rgba(232,88,10,0.35)" : "none" }}
           >
             <div className="flex items-center justify-center gap-2 mb-2">
-              <IndianRupee size={16} style={{ color: isPremium ? "#D96B42" : "#D99C42" }} strokeWidth={2} />
+              <IndianRupee size={16} style={{ color: isPremium ? "#E8580A" : "#FCD34D" }} strokeWidth={2} />
               <span
                 className="text-xs tracking-[0.2em] uppercase font-bold"
-                style={{ color: isPremium ? "#D96B42" : "rgba(255,255,255,0.7)", fontFamily: "Manrope, sans-serif" }}
+                style={{ color: isPremium ? "#E8580A" : "rgba(255,255,255,0.7)", fontFamily: "Manrope, sans-serif" }}
               >
                 Total Trip Cost (Stay + Travel)
               </span>

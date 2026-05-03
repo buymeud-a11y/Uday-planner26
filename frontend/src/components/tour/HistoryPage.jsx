@@ -42,7 +42,7 @@ const EmptyState = () => (
     <Link
       to="/"
       className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-bold text-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
-      style={{ background: "#D96B42", color: "#fff", fontFamily: "Manrope, sans-serif" }}
+      style={{ background: "#E8580A", color: "#fff", fontFamily: "Manrope, sans-serif" }}
       data-testid="btn-plan-first-trip"
     >
       <Plus size={16} /> Plan Your First Trip
@@ -63,7 +63,7 @@ const HistoryPage = () => {
   }, []);
 
   return (
-    <div style={{ background: "#FAF9F6", minHeight: "100vh", fontFamily: "Manrope, sans-serif" }}>
+    <div style={{ background: "#FDF6EE", minHeight: "100vh", fontFamily: "Manrope, sans-serif" }}>
       {/* Dark header */}
       <header className="px-4 py-14" style={{ background: "#1C3325" }}>
         <div className="max-w-5xl mx-auto">
@@ -137,7 +137,7 @@ const HistoryPage = () => {
             <Link
               to="/"
               className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-bold text-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
-              style={{ background: "#D96B42", color: "#fff", fontFamily: "Manrope, sans-serif" }}
+              style={{ background: "#E8580A", color: "#fff", fontFamily: "Manrope, sans-serif" }}
               data-testid="btn-plan-new-trip"
             >
               <Plus size={16} /> Plan a New Trip
@@ -147,7 +147,7 @@ const HistoryPage = () => {
       </main>
 
       {/* Footer */}
-      <footer className="py-10 text-center" style={{ background: "#1C3325" }}>
+      <footer className="py-10 text-center" style={{ background: "#0C3D20" }}>
         <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)", fontFamily: "Manrope, sans-serif" }}>
           Plan &amp; Tour · AI-Powered Travel Planning · Prices in INR
         </p>

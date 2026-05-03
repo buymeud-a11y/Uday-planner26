@@ -11,32 +11,33 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const tabs = [
-  { id: "plan", label: "Tour Plan", Icon: Map },
-  { id: "premium", label: "Premium Tour", Icon: Crown },
-  { id: "budget", label: "Budget Tour", Icon: Tag },
+  { id: "plan", label: "Tour Plan", Icon: Map, color: "#0891B2" },
+  { id: "premium", label: "Premium Tour", Icon: Crown, color: "#D97706" },
+  { id: "budget", label: "Budget Tour", Icon: Tag, color: "#16A34A" },
 ];
 
 const ResultsTabs = ({ activeTab, setActiveTab, planId, onShare, copied }) => (
   <div
     className="sticky top-0 z-20 border-b"
-    style={{ background: "rgba(250,249,246,0.95)", backdropFilter: "blur(8px)", borderColor: "#E5DFD3" }}
+    style={{ background: "rgba(253,246,238,0.97)", backdropFilter: "blur(8px)", borderColor: "#E0D4C0" }}
     data-testid="results-tabs"
   >
     <div className="max-w-5xl mx-auto px-4">
-      <div className="flex items-center gap-1 py-3 overflow-x-auto">
-        {tabs.map(({ id, label, Icon }) => (
+      <div className="flex items-center gap-2 py-3 overflow-x-auto">
+        {tabs.map(({ id, label, Icon, color }) => (
           <button
             key={id}
             onClick={() => setActiveTab(id)}
             data-testid={`tab-${id}`}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-200 whitespace-nowrap hover:-translate-y-0.5"
             style={{
-              background: activeTab === id ? "#1C3325" : "transparent",
-              color: activeTab === id ? "#fff" : "#4A5A50",
+              background: activeTab === id ? color : `${color}18`,
+              color: activeTab === id ? "#fff" : color,
               fontFamily: "Manrope, sans-serif",
+              boxShadow: activeTab === id ? `0 4px 14px ${color}55` : "none",
             }}
           >
-            <Icon size={14} strokeWidth={1.5} />
+            <Icon size={14} strokeWidth={1.8} />
             {label}
           </button>
         ))}
@@ -46,11 +47,12 @@ const ResultsTabs = ({ activeTab, setActiveTab, planId, onShare, copied }) => (
           <button
             onClick={onShare}
             data-testid="btn-share"
-            className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap hover:-translate-y-0.5"
+            className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-bold transition-all duration-200 whitespace-nowrap hover:-translate-y-0.5"
             style={{
-              background: copied ? "#1C3325" : "#D96B42",
+              background: copied ? "#16A34A" : "#E8580A",
               color: "#fff",
               fontFamily: "Manrope, sans-serif",
+              boxShadow: copied ? "0 4px 14px #16A34A55" : "0 4px 14px #E8580A55",
             }}
           >
             {copied ? <Check size={14} strokeWidth={2} /> : <Share2 size={14} strokeWidth={1.5} />}
@@ -182,7 +184,7 @@ const HomePage = () => {
   };
 
   return (
-    <div style={{ background: "#FAF9F6", minHeight: "100vh", fontFamily: "Manrope, sans-serif" }}>
+    <div style={{ background: "#FDF6EE", minHeight: "100vh", fontFamily: "Manrope, sans-serif" }}>
       <HeroSection
         formData={formData}
         setFormData={setFormData}
@@ -227,7 +229,7 @@ const HomePage = () => {
           )}
 
           {/* Bottom actions: Download PDF + Plan Another Trip */}
-          <div className="py-8 flex flex-wrap justify-center gap-3" style={{ background: "#FAF9F6" }}>
+          <div className="py-8 flex flex-wrap justify-center gap-3" style={{ background: "#FDF6EE" }}>
             <button
               onClick={() => window.print()}
               className="inline-flex items-center gap-2 px-8 py-3 rounded-full text-sm font-medium transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"

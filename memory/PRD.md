@@ -52,6 +52,7 @@ AI-powered web application that generates complete tour plans with Premium and B
 - None — all core features working
 
 - **History Page** (`/history`): Grid of recently planned tours (up to 20) with gradient-colored cards showing destination, highlights, premium + budget totals in INR, date, and "View Plan" link; skeleton loading state; empty state with CTA; "History" nav link in hero
+- **Vibrant Redesign**: Contrasting tabs — Teal (#0891B2) for Tour Plan, Amber (#D97706) for Premium, Emerald (#16A34A) for Budget; vivid orange-red CTAs (#E8580A); colorful meta pills; teal gradient highlights bar; 6-color history card gradients (green/orange/teal/amber/blue/purple)
 - PDF download of tour plan
 - Destination-specific hotel/car images (instead of generic stock photos)
 - Add "Places to Eat" and "Nightlife" sections to itinerary

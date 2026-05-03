@@ -10,14 +10,14 @@ const destinations = [
 const LoadingState = () => (
   <div
     className="min-h-[420px] flex flex-col items-center justify-center py-20 overflow-hidden relative"
-    style={{ background: "#F2ECE4" }}
+    style={{ background: "#E0F2FA" }}
     data-testid="loading-state"
   >
     {/* Background marquee */}
     <div className="absolute inset-0 flex items-center overflow-hidden pointer-events-none select-none">
       <div
         className="animate-marquee text-7xl font-bold"
-        style={{ color: "#1C3325", opacity: 0.06, fontFamily: "Outfit, sans-serif" }}
+        style={{ color: "#0C3D20", opacity: 0.08, fontFamily: "Outfit, sans-serif" }}
       >
         {[...destinations, ...destinations].map((d, i) => (
           <span key={i} className="mx-8">{d}</span>
@@ -30,7 +30,7 @@ const LoadingState = () => (
       <div className="flex items-center justify-center mb-6">
         <div
           className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
-          style={{ background: "#D96B42" }}
+          style={{ background: "#E8580A" }}
         >
           <Plane className="text-white float-plane" size={32} strokeWidth={1.5} />
         </div>
@@ -45,9 +45,9 @@ const LoadingState = () => (
         Searching for best hotels, routes & local experiences
       </p>
       <div className="flex gap-2 justify-center">
-        <div className="w-3 h-3 rounded-full dot-pulse-1" style={{ background: "#D96B42" }} />
-        <div className="w-3 h-3 rounded-full dot-pulse-2" style={{ background: "#D96B42" }} />
-        <div className="w-3 h-3 rounded-full dot-pulse-3" style={{ background: "#D96B42" }} />
+        <div className="w-3 h-3 rounded-full dot-pulse-1" style={{ background: "#E8580A" }} />
+        <div className="w-3 h-3 rounded-full dot-pulse-2" style={{ background: "#D97706" }} />
+        <div className="w-3 h-3 rounded-full dot-pulse-3" style={{ background: "#16A34A" }} />
       </div>
     </div>
   </div>

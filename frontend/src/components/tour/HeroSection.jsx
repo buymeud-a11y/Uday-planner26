@@ -19,7 +19,7 @@ const HeroSection = ({ formData, setFormData, onGenerate, error, loading }) => {
       {/* Overlay */}
       <div
         className="absolute inset-0"
-        style={{ background: "linear-gradient(135deg, rgba(28,51,37,0.88) 0%, rgba(28,51,37,0.65) 60%, rgba(28,51,37,0.5) 100%)" }}
+        style={{ background: "linear-gradient(135deg, rgba(7,45,28,0.92) 0%, rgba(12,75,50,0.72) 55%, rgba(5,65,70,0.55) 100%)" }}
       />
 
       {/* Top nav bar */}
@@ -204,7 +204,7 @@ const HeroSection = ({ formData, setFormData, onGenerate, error, loading }) => {
                   onClick={() => onGenerate("plan")}
                   disabled={loading}
                   className="w-full h-14 rounded-full font-bold text-base transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
-                  style={{ background: "#D96B42", color: "#fff", fontFamily: "Manrope, sans-serif" }}
+                  style={{ background: "#E8580A", color: "#fff", fontFamily: "Manrope, sans-serif" }}
                   data-testid="btn-plan-tour"
                 >
                   {loading ? "Generating..." : "Plan Tour"}
@@ -214,7 +214,7 @@ const HeroSection = ({ formData, setFormData, onGenerate, error, loading }) => {
                     onClick={() => onGenerate("premium")}
                     disabled={loading}
                     className="h-14 rounded-full font-bold text-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
-                    style={{ background: "#1C3325", color: "#fff", fontFamily: "Manrope, sans-serif" }}
+                    style={{ background: "#0C3D20", color: "#fff", fontFamily: "Manrope, sans-serif" }}
                     data-testid="btn-premium-tour"
                   >
                     Premium Tour
@@ -223,7 +223,7 @@ const HeroSection = ({ formData, setFormData, onGenerate, error, loading }) => {
                     onClick={() => onGenerate("budget")}
                     disabled={loading}
                     className="h-14 rounded-full font-bold text-sm transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
-                    style={{ border: "2px solid #D96B42", color: "#D96B42", background: "transparent", fontFamily: "Manrope, sans-serif" }}
+                    style={{ border: "2px solid #E8580A", color: "#E8580A", background: "transparent", fontFamily: "Manrope, sans-serif" }}
                     data-testid="btn-budget-tour"
                   >
                     Budget Tour
