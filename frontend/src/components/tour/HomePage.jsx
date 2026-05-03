@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { Map, Crown, Tag, RefreshCw, Share2, Check } from "lucide-react";
+import { Map, Crown, Tag, RefreshCw, Share2, Check, Download } from "lucide-react";
 import HeroSection from "./HeroSection";
 import TourPlanSection from "./TourPlanSection";
 import PlanCard from "./PlanCard";
 import LoadingState from "./LoadingState";
+import PrintableView from "./PrintableView";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -225,8 +226,17 @@ const HomePage = () => {
             />
           )}
 
-          {/* Reset button */}
-          <div className="py-8 text-center" style={{ background: "#FAF9F6" }}>
+          {/* Bottom actions: Download PDF + Plan Another Trip */}
+          <div className="py-8 flex flex-wrap justify-center gap-3" style={{ background: "#FAF9F6" }}>
+            <button
+              onClick={() => window.print()}
+              className="inline-flex items-center gap-2 px-8 py-3 rounded-full text-sm font-medium transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+              style={{ background: "#1C3325", color: "#fff", fontFamily: "Manrope, sans-serif" }}
+              data-testid="btn-download-pdf"
+            >
+              <Download size={14} strokeWidth={1.5} />
+              Download PDF
+            </button>
             <button
               onClick={handleReset}
               className="inline-flex items-center gap-2 px-8 py-3 rounded-full text-sm font-medium transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
@@ -237,6 +247,9 @@ const HomePage = () => {
               Plan Another Trip
             </button>
           </div>
+
+          {/* Hidden printable view — visible only on print/PDF */}
+          <PrintableView tourData={tourData} />
         </>
       )}
 

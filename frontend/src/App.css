@@ -58,3 +58,44 @@ input:focus, textarea:focus {
   outline: none;
   box-shadow: none;
 }
+
+/* ─── Print / PDF Styles ─────────────────────────────── */
+
+/* Hidden from screen; shown only when printing */
+#printable-tour-plan {
+  display: none;
+  font-family: 'Manrope', Arial, sans-serif;
+  font-size: 13px;
+  color: #1C3325;
+  background: #fff;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+@media print {
+  /* Hide everything on screen */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Show only the printable content */
+  #printable-tour-plan,
+  #printable-tour-plan * {
+    visibility: visible;
+  }
+
+  #printable-tour-plan {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0;
+    background: white;
+  }
+
+  @page {
+    size: A4;
+    margin: 15mm 18mm;
+  }
+}
