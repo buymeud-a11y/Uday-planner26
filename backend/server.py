@@ -142,7 +142,7 @@ async def generate_tour_plan(request: TourRequest):
             api_key=emergent_key,
             session_id=str(uuid.uuid4()),
             system_message=TOUR_SYSTEM_PROMPT
-        ).with_model("anthropic", "claude-4-sonnet-20250514")
+        ).with_model("anthropic", "claude-haiku-4-5-20251001")
 
         user_text = f"Create a detailed {request.days}-day tour plan for {request.place}."
         if request.budget:
