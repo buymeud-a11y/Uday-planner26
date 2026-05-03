@@ -51,8 +51,7 @@ AI-powered web application that generates complete tour plans with Premium and B
 ### P0 (Critical — for next session)
 - None — all core features working
 
-### P1 (High Value)
-- Share tour plan via link (generate shareable URL)
+- **Share Tour Plan**: `GET /api/tour/share/{plan_id}` — fetch saved plan; URL updates to `?plan={id}` after generation; Share button copies URL + shows "Copied!" toast for 2.5s; opening shared URL loads plan directly from MongoDB
 - PDF download of tour plan
 - Destination-specific hotel/car images (instead of generic stock photos)
 - Add "Places to Eat" and "Nightlife" sections to itinerary
