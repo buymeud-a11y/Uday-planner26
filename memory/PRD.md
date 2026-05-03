@@ -51,7 +51,7 @@ AI-powered web application that generates complete tour plans with Premium and B
 ### P0 (Critical — for next session)
 - None — all core features working
 
-- **PDF/Print Download**: "Download PDF" button (dark green) at bottom of results; `window.print()` triggers browser print dialog; hidden `PrintableView` component renders full A4 layout (header, itinerary, premium plan, budget plan, travel tips) with `@media print` CSS — user saves as PDF from print dialog
+- **History Page** (`/history`): Grid of recently planned tours (up to 20) with gradient-colored cards showing destination, highlights, premium + budget totals in INR, date, and "View Plan" link; skeleton loading state; empty state with CTA; "History" nav link in hero
 - PDF download of tour plan
 - Destination-specific hotel/car images (instead of generic stock photos)
 - Add "Places to Eat" and "Nightlife" sections to itinerary
