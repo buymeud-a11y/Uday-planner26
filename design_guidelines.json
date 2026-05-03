@@ -1,0 +1,97 @@
+{
+  "theme_and_archetype": {
+    "theme": "LIGHT",
+    "archetype": "1 (Organic & Earthy)",
+    "vibe": "Approachable, optimistic, tactile, premium travel",
+    "reasoning": "Travel planning is about inspiration and trust. Organic and earthy tones create a warm, inviting environment. A light theme allows destination photography to stand out as the hero, while high-contrast typography ensures the AI's output is highly legible."
+  },
+  "color_palette": {
+    "background": {
+      "primary": "#FAF9F6",
+      "secondary": "#F2ECE4",
+      "tertiary": "#EAE3D9"
+    },
+    "text": {
+      "primary": "#1C3325",
+      "secondary": "#4A5A50",
+      "muted": "#75837A",
+      "inverse": "#FFFFFF"
+    },
+    "accent": {
+      "primary": "#D96B42",
+      "primary_hover": "#C05A35",
+      "secondary": "#D99C42",
+      "premium_card_bg": "#1C3325",
+      "budget_card_bg": "#FFFFFF"
+    },
+    "border": {
+      "default": "#E5DFD3",
+      "focus": "#D96B42"
+    }
+  },
+  "typography": {
+    "font_family": {
+      "headings": "Outfit, sans-serif",
+      "body": "Manrope, sans-serif"
+    },
+    "rules": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tight font-medium",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight font-medium",
+      "h3": "text-xl sm:text-2xl tracking-tight font-medium",
+      "h4": "text-lg sm:text-xl font-medium",
+      "body": "text-base leading-relaxed font-normal",
+      "label": "text-xs tracking-[0.2em] uppercase font-bold"
+    }
+  },
+  "spacing_and_layout": {
+    "general": "Use generous padding. Standard container padding should be p-8 to p-12. Avoid default Bootstrap grids; embrace asymmetrical grids (Bento layouts) for input forms.",
+    "grid_modes": {
+      "hero_form": "grid-cols-1 md:grid-cols-12 gap-8. Input form spans 5 cols, hero image/branding spans 7 cols.",
+      "results_bento": "grid-cols-1 md:grid-cols-2 gap-6 for Premium vs Budget comparison."
+    },
+    "component_geometry": "Use rounded-2xl for main cards and form inputs to feel tactile ('Clay & Crisp' Neumorphism variant). 1px subtle borders (border-default) with soft shadows (shadow-sm) to lift them off the base background."
+  },
+  "motion_and_interactions": {
+    "hover_states": "Cards lift slightly (-translate-y-1) and shadow deepens. Buttons transition background color. ALWAYS set explicit text color on hover.",
+    "loading_state": "Do not use a standard spinner. Use 'The Living Texture' marquee of travel destination names in a very pale color in the background, with a prominent 'AI is crafting your perfect itinerary...' message in the foreground.",
+    "page_transitions": "Smooth staggered fade-in for the itinerary items. Do not stagger more than 5 items to avoid sluggishness."
+  },
+  "component_guidelines": {
+    "buttons": "Shadcn UI Button. Rounded-full. Primary CTA is Terracotta (#D96B42) with white text. Premium CTA uses Deep Forest Green (#1C3325).",
+    "inputs": "Shadcn UI Input and Select. Generous padding (h-14). Remove default blue focus rings and replace with focus:ring-accent-primary.",
+    "cards": "Premium Plan Card: Use dark theme inversion (bg-[#1C3325] text-white). Budget Plan Card: Clean white (bg-white text-[#1C3325]) with a 1px border. Both need high internal padding (p-8).",
+    "icons": "Use lucide-react. Stroke width 1.5 for a clean, premium look."
+  },
+  "media_and_images": {
+    "hero_background": {
+      "url": "https://images.unsplash.com/photo-1711907309566-1fa08d49df57?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwxfHxrZXJhbGElMjB0cmF2ZWwlMjBiYWNrd2F0ZXJzfGVufDB8fHx8MTc3Nzc4ODU4MXww&ixlib=rb-4.1.0&q=85",
+      "description": "Kerala backwaters. Use alongside the hero section. Max overlay opacity bg-black/30 or gradient overlay if text is on top."
+    },
+    "premium_hotel": {
+      "url": "https://images.pexels.com/photos/18201945/pexels-photo-18201945.jpeg",
+      "description": "Luxury hotel room image for the Premium Plan card."
+    },
+    "budget_hotel": {
+      "url": "https://images.unsplash.com/photo-1637149690800-41dea371493f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTF8MHwxfHNlYXJjaHwyfHxidWRnZXQlMjBob3RlbCUyMHJvb218ZW58MHx8fHwxNzc3Nzg4NTgxfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Neat, modern budget room image for the Budget Plan card."
+    },
+    "travel_journey": {
+      "url": "https://images.pexels.com/photos/800649/pexels-photo-800649.jpeg",
+      "description": "Dynamic hatchback driving through nature. Can be used in the itinerary or loading state background."
+    },
+    "destination_fallback": {
+      "url": "https://images.unsplash.com/photo-1685850749074-9cf8023d7e8d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njl8MHwxfHNlYXJjaHwxfHxpbmRpYSUyMHRyYXZlbCUyMGRlc3RpbmF0aW9uc3xlbnwwfHx8fDE3Nzc3ODg1NzF8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Scenic Indian mountain view. Use as a fallback for the generated tour plan cover."
+    }
+  },
+  "instructions_to_main_agent": [
+    "Strictly follow the color palette. No generic Bootstrap blues or Vercel blacks. Use the Organic & Earthy palette.",
+    "Do NOT use 'Inter' font. Use 'Outfit' for headings and 'Manrope' for body. You must include these via Google Fonts in index.html or globals.css.",
+    "Ensure all user inputs (Place, Days, Budget) are gathered in a beautiful bento-grid form on the hero page, not a standard vertical stack.",
+    "The output MUST be a seamless Single Page Application experience. When the form is submitted, scroll down smoothly to the AI loading state, and then reveal the Tour Itinerary and the two Plan Cards (Premium vs Budget).",
+    "Format costs in INR using the standard Indian numbering format (e.g., \u20b91,00,000).",
+    "Use data-testid attributes on all interactive elements (e.g., data-testid='input-place', data-testid='btn-plan-tour', data-testid='card-premium').",
+    "Use Shadcn UI components for structure but strip the 'Vercel-look'. Override radii to rounded-2xl and use the custom colors.",
+    "Premium card must have an inverted color scheme (dark green background, white text) compared to the Budget card (white background, dark text) to emphasize the contrast."
+  ]
+}
