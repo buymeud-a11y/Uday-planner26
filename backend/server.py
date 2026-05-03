@@ -169,17 +169,21 @@ async def generate_tour_plan(request: TourRequest):
         tour_data = json.loads(json_str)
         logger.info(f"Tour plan generated successfully for: {request.place}")
 
-        # Save to MongoDB
+        # Save to MongoDB (including full tour_data for sharing)
+        plan_id = str(uuid.uuid4())
         doc = {
-            "plan_id": str(uuid.uuid4()),
+            "plan_id": plan_id,
             "place": request.place,
             "days": request.days,
             "budget": request.budget,
             "destination": tour_data.get("destination", request.place),
+            "tour_data": tour_data,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         await db.tour_plans.insert_one(doc)
 
+        # Include plan_id in response so frontend can build share URL
+        tour_data["plan_id"] = plan_id
         return tour_data
 
     except json.JSONDecodeError as e:
@@ -190,6 +194,16 @@ async def generate_tour_plan(request: TourRequest):
     except Exception as e:
         logger.error(f"Tour generation error: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to generate tour plan: {str(e)}")
+
+
+@api_router.get("/tour/share/{plan_id}")
+async def get_shared_plan(plan_id: str):
+    doc = await db.tour_plans.find_one({"plan_id": plan_id}, {"_id": 0})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Tour plan not found or link has expired.")
+    tour_data = doc.get("tour_data", {})
+    tour_data["plan_id"] = plan_id
+    return tour_data
 
 
 @api_router.get("/tour/history")

@@ -1,6 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { Map, Crown, Tag, RefreshCw } from "lucide-react";
+import { Map, Crown, Tag, RefreshCw, Share2, Check } from "lucide-react";
 import HeroSection from "./HeroSection";
 import TourPlanSection from "./TourPlanSection";
 import PlanCard from "./PlanCard";
@@ -15,14 +15,14 @@ const tabs = [
   { id: "budget", label: "Budget Tour", Icon: Tag },
 ];
 
-const ResultsTabs = ({ activeTab, setActiveTab }) => (
+const ResultsTabs = ({ activeTab, setActiveTab, planId, onShare, copied }) => (
   <div
     className="sticky top-0 z-20 border-b"
     style={{ background: "rgba(250,249,246,0.95)", backdropFilter: "blur(8px)", borderColor: "#E5DFD3" }}
     data-testid="results-tabs"
   >
     <div className="max-w-5xl mx-auto px-4">
-      <div className="flex gap-1 py-3 overflow-x-auto">
+      <div className="flex items-center gap-1 py-3 overflow-x-auto">
         {tabs.map(({ id, label, Icon }) => (
           <button
             key={id}
@@ -39,6 +39,23 @@ const ResultsTabs = ({ activeTab, setActiveTab }) => (
             {label}
           </button>
         ))}
+
+        {/* Share button */}
+        {planId && (
+          <button
+            onClick={onShare}
+            data-testid="btn-share"
+            className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap hover:-translate-y-0.5"
+            style={{
+              background: copied ? "#1C3325" : "#D96B42",
+              color: "#fff",
+              fontFamily: "Manrope, sans-serif",
+            }}
+          >
+            {copied ? <Check size={14} strokeWidth={2} /> : <Share2 size={14} strokeWidth={1.5} />}
+            {copied ? "Copied!" : "Share Plan"}
+          </button>
+        )}
       </div>
     </div>
   </div>
@@ -58,7 +75,31 @@ const HomePage = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("plan");
   const [error, setError] = useState(null);
+  const [planId, setPlanId] = useState(null);
+  const [copied, setCopied] = useState(false);
   const resultsRef = useRef(null);
+
+  // On mount: check for ?plan= param and load shared plan
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sharedPlanId = params.get("plan");
+    if (sharedPlanId) {
+      setLoading(true);
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 200);
+      axios.get(`${API}/tour/share/${sharedPlanId}`)
+        .then((res) => {
+          setTourData(res.data);
+          setPlanId(sharedPlanId);
+          setActiveTab("plan");
+        })
+        .catch(() => {
+          setError("This shared tour plan could not be found or has expired.");
+        })
+        .finally(() => setLoading(false));
+    }
+  }, []);
 
   const handleGenerate = async (tab) => {
     if (!formData.place.trim()) {
@@ -74,8 +115,12 @@ const HomePage = () => {
     setLoading(true);
     setError(null);
     setTourData(null);
+    setPlanId(null);
 
-    // Scroll to loading section
+    // Clear any existing ?plan= from URL
+    const cleanUrl = window.location.pathname;
+    window.history.replaceState({}, "", cleanUrl);
+
     setTimeout(() => {
       resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 100);
@@ -90,7 +135,15 @@ const HomePage = () => {
       }
 
       const response = await axios.post(`${API}/tour/generate`, payload);
-      setTourData(response.data);
+      const data = response.data;
+      setTourData(data);
+
+      // Update URL with plan_id for shareability
+      if (data.plan_id) {
+        setPlanId(data.plan_id);
+        const newUrl = `${window.location.pathname}?plan=${data.plan_id}`;
+        window.history.replaceState({}, "", newUrl);
+      }
     } catch (err) {
       const detail = err.response?.data?.detail;
       setError(detail || "Failed to generate tour plan. Please try again.");
@@ -99,10 +152,31 @@ const HomePage = () => {
     }
   };
 
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}${window.location.pathname}?plan=${planId}`;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+    } catch {
+      // Fallback for older browsers
+      const el = document.createElement("textarea");
+      el.value = shareUrl;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
+
   const handleReset = () => {
     setTourData(null);
     setError(null);
+    setPlanId(null);
+    setCopied(false);
     setFormData({ place: "", days: "", budget: "" });
+    const cleanUrl = window.location.pathname;
+    window.history.replaceState({}, "", cleanUrl);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -123,7 +197,13 @@ const HomePage = () => {
 
       {tourData && !loading && (
         <>
-          <ResultsTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+          <ResultsTabs
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            planId={planId}
+            onShare={handleShare}
+            copied={copied}
+          />
 
           {activeTab === "plan" && (
             <TourPlanSection tourData={tourData} />
