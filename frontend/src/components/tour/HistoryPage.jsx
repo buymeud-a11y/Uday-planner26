@@ -60,6 +60,7 @@ const HistoryPage = () => {
       .then((res) => setPlans(res.data))
       .catch(() => setError("Could not load history. Please try again."))
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

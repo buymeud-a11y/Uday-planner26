@@ -20,7 +20,7 @@ const LoadingState = () => (
         style={{ color: "#0C3D20", opacity: 0.08, fontFamily: "Outfit, sans-serif" }}
       >
         {[...destinations, ...destinations].map((d, i) => (
-          <span key={i} className="mx-8">{d}</span>
+          <span key={`${d}-${i}`} className="mx-8">{d}</span>
         ))}
       </div>
     </div>

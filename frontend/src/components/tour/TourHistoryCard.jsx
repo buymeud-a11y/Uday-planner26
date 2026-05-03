@@ -63,9 +63,9 @@ const TourHistoryCard = ({ plan, index }) => {
         {/* Highlights */}
         {plan.highlights?.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-4">
-            {plan.highlights.map((h, i) => (
+            {plan.highlights.map((h) => (
               <span
-                key={i}
+                key={h}
                 className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full"
                 style={{ background: "#E8F4FB", color: "#0E7490" }}
               >

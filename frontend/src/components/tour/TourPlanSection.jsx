@@ -79,9 +79,9 @@ const DayCard = ({ day, index }) => (
     <div className="border-t pt-3" style={{ borderColor: "#E5DFD3" }}>
       {day.places_visited?.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-2">
-          {day.places_visited.map((place, i) => (
+          {day.places_visited.map((place) => (
             <span
-              key={i}
+              key={place}
               className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full"
               style={{ background: "#F2ECE4", color: "#4A5A50" }}
             >
@@ -150,9 +150,9 @@ const TourPlanSection = ({ tourData }) => (
             Top Highlights
           </h3>
           <div className="flex flex-wrap gap-2">
-            {tourData.highlights.map((h, i) => (
+            {tourData.highlights.map((h) => (
               <div
-                key={i}
+                key={h}
                 className="flex items-center gap-1.5 text-sm px-4 py-2 rounded-full"
                 style={{ background: "rgba(255,255,255,0.18)", color: "#fff" }}
               >
@@ -181,8 +181,8 @@ const TourPlanSection = ({ tourData }) => (
             </h3>
           </div>
           <ul className="space-y-2">
-            {tourData.travel_tips.map((tip, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm" style={{ color: "#78350F" }}>
+            {tourData.travel_tips.map((tip) => (
+              <li key={tip} className="flex items-start gap-2 text-sm" style={{ color: "#78350F" }}>
                 <span className="font-bold mt-0.5" style={{ color: "#D97706" }}>•</span>
                 {tip}
               </li>

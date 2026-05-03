@@ -40,32 +40,88 @@ const CostBox = ({ label, total, bg = "#D96B42" }) => (
   </div>
 );
 
+const normalizePrintHotels = (plan) => {
+  if (Array.isArray(plan?.hotels) && plan.hotels.length > 0) return plan.hotels;
+  if (!plan?.hotel) return [];
+  return [{
+    city: plan.hotel.city,
+    name: plan.hotel.name,
+    stars: plan.hotel.stars,
+    google_rating: plan.hotel.google_rating,
+    location: plan.hotel.location,
+    price_per_night_inr: plan.hotel.price_per_night_inr,
+    nights_stay: null,
+    total_cost_inr: plan.hotel.total_stay_cost_inr,
+    amenities: plan.hotel.amenities,
+  }];
+};
+
+const PrintableHotel = ({ hotel, showDivider, isMultiCity }) => {
+  const nightsLabel = hotel.nights_stay
+    ? ` · ${hotel.nights_stay} night${hotel.nights_stay === 1 ? "" : "s"}`
+    : "";
+  return (
+    <div
+      style={{
+        paddingBottom: "8px",
+        marginBottom: showDivider ? "8px" : 0,
+        borderBottom: showDivider ? "1px dashed #E5DFD3" : "none",
+      }}
+    >
+      {isMultiCity && hotel.city && (
+        <p
+          style={{
+            margin: "0 0 3px",
+            fontSize: "11px",
+            fontWeight: "bold",
+            color: "#D96B42",
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+          }}
+        >
+          {hotel.city}{nightsLabel}
+        </p>
+      )}
+      <p style={{ margin: "0 0 3px", fontWeight: "bold", fontSize: "13px", color: "#1C3325" }}>
+        {hotel.name}
+      </p>
+      <p style={{ margin: "0 0 2px", fontSize: "11px", color: "#D99C42" }}>
+        {stars(hotel.stars)} &nbsp; Google: {hotel.google_rating}/5
+      </p>
+      {hotel.location && (
+        <p style={{ margin: "0 0 2px", fontSize: "11px", color: "#4A5A50" }}>{hotel.location}</p>
+      )}
+      <p style={{ margin: "0 0 2px", fontSize: "11px", color: "#4A5A50" }}>
+        Per night: {fmt(hotel.price_per_night_inr)}{nightsLabel}
+      </p>
+      <p style={{ margin: "0", fontSize: "12px", fontWeight: "bold", color: "#1C3325" }}>
+        Subtotal: {fmt(hotel.total_cost_inr)}
+      </p>
+      {hotel.amenities?.length > 0 && (
+        <p style={{ margin: "4px 0 0", fontSize: "10px", color: "#75837A" }}>
+          {hotel.amenities.join(" · ")}
+        </p>
+      )}
+    </div>
+  );
+};
+
+const printHotelKey = (hotel, idx) => `${hotel.city || "stay"}-${hotel.name || idx}`;
+
 const PlanSection = ({ plan, type }) => {
   const isPremium = type === "premium";
+  const hotelsList = normalizePrintHotels(plan);
 
-  // Normalize hotels: support new array format OR legacy single-hotel format
-  const hotelsList = Array.isArray(plan?.hotels) && plan.hotels.length > 0
-    ? plan.hotels
-    : plan?.hotel
-      ? [{
-          city: plan.hotel.city,
-          name: plan.hotel.name,
-          stars: plan.hotel.stars,
-          google_rating: plan.hotel.google_rating,
-          location: plan.hotel.location,
-          price_per_night_inr: plan.hotel.price_per_night_inr,
-          nights_stay: null,
-          total_cost_inr: plan.hotel.total_stay_cost_inr,
-          amenities: plan.hotel.amenities,
-        }]
-      : [];
+  const headerBg = isPremium ? "#1C3325" : "#F2ECE4";
+  const headerText = isPremium ? "#fff" : "#1C3325";
+  const totalBoxBg = isPremium ? "#D96B42" : "#1C3325";
 
   return (
     <div style={{ marginBottom: "20px" }}>
       <div
         style={{
-          background: isPremium ? "#1C3325" : "#F2ECE4",
-          color: isPremium ? "#fff" : "#1C3325",
+          background: headerBg,
+          color: headerText,
           borderRadius: "8px",
           padding: "12px 16px",
           marginBottom: "12px",
@@ -79,48 +135,18 @@ const PlanSection = ({ plan, type }) => {
         </p>
       </div>
 
-      {/* Hotels section */}
+      {/* Hotels */}
       <div style={{ border: "1px solid #E5DFD3", borderRadius: "8px", padding: "12px", marginBottom: "12px" }}>
         <p style={{ margin: "0 0 8px", fontSize: "11px", color: "#75837A", textTransform: "uppercase", letterSpacing: "0.1em" }}>
           Accommodation{hotelsList.length > 1 ? ` · ${hotelsList.length} Stays` : ""}
         </p>
-        {hotelsList.map((h, idx) => (
-          <div
-            key={idx}
-            style={{
-              paddingBottom: "8px",
-              marginBottom: idx < hotelsList.length - 1 ? "8px" : 0,
-              borderBottom: idx < hotelsList.length - 1 ? "1px dashed #E5DFD3" : "none",
-            }}
-          >
-            {h.city && hotelsList.length > 1 && (
-              <p style={{ margin: "0 0 3px", fontSize: "11px", fontWeight: "bold", color: "#D96B42", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                {h.city}
-                {h.nights_stay ? ` · ${h.nights_stay} night${h.nights_stay === 1 ? "" : "s"}` : ""}
-              </p>
-            )}
-            <p style={{ margin: "0 0 3px", fontWeight: "bold", fontSize: "13px", color: "#1C3325" }}>
-              {h.name}
-            </p>
-            <p style={{ margin: "0 0 2px", fontSize: "11px", color: "#D99C42" }}>
-              {stars(h.stars)} &nbsp; Google: {h.google_rating}/5
-            </p>
-            {h.location && (
-              <p style={{ margin: "0 0 2px", fontSize: "11px", color: "#4A5A50" }}>{h.location}</p>
-            )}
-            <p style={{ margin: "0 0 2px", fontSize: "11px", color: "#4A5A50" }}>
-              Per night: {fmt(h.price_per_night_inr)}
-              {h.nights_stay ? ` · ${h.nights_stay} night${h.nights_stay === 1 ? "" : "s"}` : ""}
-            </p>
-            <p style={{ margin: "0", fontSize: "12px", fontWeight: "bold", color: "#1C3325" }}>
-              Subtotal: {fmt(h.total_cost_inr)}
-            </p>
-            {h.amenities?.length > 0 && (
-              <p style={{ margin: "4px 0 0", fontSize: "10px", color: "#75837A" }}>
-                {h.amenities.join(" · ")}
-              </p>
-            )}
-          </div>
+        {hotelsList.map((hotel, idx) => (
+          <PrintableHotel
+            key={printHotelKey(hotel, idx)}
+            hotel={hotel}
+            showDivider={idx < hotelsList.length - 1}
+            isMultiCity={hotelsList.length > 1}
+          />
         ))}
         {hotelsList.length > 1 && (
           <p style={{ margin: "8px 0 0", fontSize: "12px", fontWeight: "bold", color: "#1C3325", textAlign: "right" }}>
@@ -154,7 +180,7 @@ const PlanSection = ({ plan, type }) => {
       <CostBox
         label={`${isPremium ? "PREMIUM" : "BUDGET"} PLAN TOTAL (Stay + Transport)`}
         total={fmt(plan?.grand_total_inr)}
-        bg={isPremium ? "#D96B42" : "#1C3325"}
+        bg={totalBoxBg}
       />
       {plan?.cost_notes && (
         <p style={{ margin: "6px 0 0", fontSize: "10px", color: "#75837A" }}>* {plan.cost_notes}</p>
@@ -162,6 +188,51 @@ const PlanSection = ({ plan, type }) => {
     </div>
   );
 };
+
+const ItineraryDay = ({ day }) => (
+  <div style={{ marginBottom: "14px", paddingBottom: "14px", borderBottom: "1px solid #F2ECE4" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "7px" }}>
+      <span
+        style={{
+          width: "26px", height: "26px", borderRadius: "50%", background: "#D96B42",
+          color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center",
+          fontSize: "12px", fontWeight: "bold", flexShrink: 0,
+        }}
+      >
+        {day.day}
+      </span>
+      <strong style={{ fontSize: "14px", color: "#1C3325", fontFamily: "Outfit, sans-serif" }}>
+        {day.title}
+      </strong>
+    </div>
+    {day.morning && (
+      <p style={{ margin: "0 0 5px", fontSize: "12px", color: "#4A5A50" }}>
+        <strong style={{ color: "#75837A" }}>Morning: </strong>{day.morning}
+      </p>
+    )}
+    {day.afternoon && (
+      <p style={{ margin: "0 0 5px", fontSize: "12px", color: "#4A5A50" }}>
+        <strong style={{ color: "#75837A" }}>Afternoon: </strong>{day.afternoon}
+      </p>
+    )}
+    {day.evening && (
+      <p style={{ margin: "0 0 5px", fontSize: "12px", color: "#4A5A50" }}>
+        <strong style={{ color: "#75837A" }}>Evening: </strong>{day.evening}
+      </p>
+    )}
+    {day.food_recommendation && (
+      <p style={{ margin: "0 0 3px", fontSize: "11px", color: "#D96B42" }}>
+        Food: {day.food_recommendation}
+        {day.estimated_food_cost_inr ? ` · Est. ${fmt(day.estimated_food_cost_inr)}` : ""}
+      </p>
+    )}
+    {day.places_visited?.length > 0 && (
+      <p style={{ margin: 0, fontSize: "10px", color: "#75837A" }}>
+        Places: {day.places_visited.join(", ")}
+      </p>
+    )}
+  </div>
+);
 
 const PrintableView = ({ tourData }) => {
   if (!tourData) return null;
@@ -221,51 +292,7 @@ const PrintableView = ({ tourData }) => {
       <div style={{ marginBottom: "20px" }}>
         <SectionHeading>Day-by-Day Itinerary</SectionHeading>
         {itinerary?.map((day) => (
-          <div
-            key={day.day}
-            style={{ marginBottom: "14px", paddingBottom: "14px", borderBottom: "1px solid #F2ECE4" }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "7px" }}>
-              <span
-                style={{
-                  width: "26px", height: "26px", borderRadius: "50%", background: "#D96B42",
-                  color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "12px", fontWeight: "bold", flexShrink: 0,
-                }}
-              >
-                {day.day}
-              </span>
-              <strong style={{ fontSize: "14px", color: "#1C3325", fontFamily: "Outfit, sans-serif" }}>
-                {day.title}
-              </strong>
-            </div>
-            {day.morning && (
-              <p style={{ margin: "0 0 5px", fontSize: "12px", color: "#4A5A50" }}>
-                <strong style={{ color: "#75837A" }}>Morning: </strong>{day.morning}
-              </p>
-            )}
-            {day.afternoon && (
-              <p style={{ margin: "0 0 5px", fontSize: "12px", color: "#4A5A50" }}>
-                <strong style={{ color: "#75837A" }}>Afternoon: </strong>{day.afternoon}
-              </p>
-            )}
-            {day.evening && (
-              <p style={{ margin: "0 0 5px", fontSize: "12px", color: "#4A5A50" }}>
-                <strong style={{ color: "#75837A" }}>Evening: </strong>{day.evening}
-              </p>
-            )}
-            {day.food_recommendation && (
-              <p style={{ margin: "0 0 3px", fontSize: "11px", color: "#D96B42" }}>
-                Food: {day.food_recommendation}
-                {day.estimated_food_cost_inr ? ` · Est. ${fmt(day.estimated_food_cost_inr)}` : ""}
-              </p>
-            )}
-            {day.places_visited?.length > 0 && (
-              <p style={{ margin: 0, fontSize: "10px", color: "#75837A" }}>
-                Places: {day.places_visited.join(", ")}
-              </p>
-            )}
-          </div>
+          <ItineraryDay key={day.day} day={day} />
         ))}
       </div>
 
@@ -282,8 +309,8 @@ const PrintableView = ({ tourData }) => {
         <div style={{ marginBottom: "20px" }}>
           <SectionHeading>Travel Tips</SectionHeading>
           <ul style={{ margin: 0, paddingLeft: "18px" }}>
-            {travel_tips.map((tip, i) => (
-              <li key={i} style={{ fontSize: "12px", color: "#4A5A50", marginBottom: "4px" }}>{tip}</li>
+            {travel_tips.map((tip) => (
+              <li key={tip} style={{ fontSize: "12px", color: "#4A5A50", marginBottom: "4px" }}>{tip}</li>
             ))}
           </ul>
         </div>
