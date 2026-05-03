@@ -18,6 +18,9 @@ AI-powered web application that generates complete tour plans with Premium and B
 5. All costs in Indian Rupees (INR)
 6. Mobile responsive, modern design
 
+## Recent Updates (Feb 2026)
+- **Multi-city hotel mapping fix**: AI prompt now returns a `hotels[]` array per plan with city, nights_stay, price_per_night_inr, total_cost_inr. For multi-city tours (e.g., Rajasthan circuit Jaipur/Jodhpur/Jaisalmer/Udaipur), hotels are now distributed across cities in both Premium & Budget plans with matching nights_stay. `PlanCard.jsx` and `PrintableView.jsx` render each hotel as an individual card with city badge; backward-compatible with older single-`hotel` records.
+
 ## What's Been Implemented (May 2026)
 - **Hero Section**: Full-height with Kerala backwaters background, bento-grid form
 - **Input Form**: Destination, Days, Budget (optional) with 3 action buttons

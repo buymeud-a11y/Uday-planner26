@@ -41,6 +41,7 @@ Return a JSON object with this exact structure (fill in all real values):
   "destination": "city/place name",
   "state_country": "state or country name",
   "duration_days": <number>,
+  "is_multi_city": <true if the trip visits 2+ cities/towns, false if single base city>,
   "overview": "engaging 2-3 sentence description of destination",
   "best_time_to_visit": "recommended months e.g. October to March",
   "highlights": ["top attraction 1", "top attraction 2", "top attraction 3", "top attraction 4"],
@@ -57,16 +58,20 @@ Return a JSON object with this exact structure (fill in all real values):
     }
   ],
   "premium_plan": {
-    "hotel": {
-      "name": "Real 3-4 star hotel name that exists at destination",
-      "stars": 4,
-      "google_rating": 4.4,
-      "location": "specific neighbourhood/area",
-      "price_per_night_inr": <number>,
-      "total_stay_cost_inr": <price_per_night * (duration-1)>,
-      "amenities": ["Swimming Pool", "Restaurant", "Spa", "WiFi", "Room Service"],
-      "why_recommended": "Short reason why this hotel is a great premium choice"
-    },
+    "hotels": [
+      {
+        "city": "City name where this hotel is located",
+        "name": "Real 3-4 star hotel name that exists in this city",
+        "stars": 4,
+        "google_rating": 4.4,
+        "location": "specific neighbourhood/area",
+        "price_per_night_inr": <number>,
+        "nights_stay": <number of nights staying in this hotel>,
+        "total_cost_inr": <price_per_night * nights_stay>,
+        "amenities": ["Swimming Pool", "Restaurant", "Spa", "WiFi", "Room Service"],
+        "why_recommended": "Short reason why this hotel is a great premium choice"
+      }
+    ],
     "transport": {
       "vehicle_type": "Sedan",
       "recommended_models": "Honda City / Toyota Corolla / Maruti Ciaz",
@@ -75,22 +80,26 @@ Return a JSON object with this exact structure (fill in all real values):
       "includes_driver": true,
       "rental_suggestions": "Book via Zoomcar, Myles, or local cab service aggregators"
     },
-    "total_stay_cost_inr": <same as hotel total>,
+    "total_stay_cost_inr": <sum of all hotels total_cost_inr>,
     "total_transport_cost_inr": <same as transport total>,
     "grand_total_inr": <stay + transport>,
     "cost_notes": "Prices approximate and may vary by season"
   },
   "budget_plan": {
-    "hotel": {
-      "name": "Real budget hotel or OYO property name at destination",
-      "stars": 2,
-      "google_rating": 4.1,
-      "location": "specific neighbourhood/area",
-      "price_per_night_inr": <number between 700-2500>,
-      "total_stay_cost_inr": <price_per_night * (duration-1)>,
-      "amenities": ["AC", "WiFi", "Hot Water", "24hr Checkout"],
-      "why_recommended": "Good value, clean rooms, well-rated on OYO or MakeMyTrip"
-    },
+    "hotels": [
+      {
+        "city": "City name where this hotel is located",
+        "name": "Real budget hotel or OYO property name in this city",
+        "stars": 2,
+        "google_rating": 4.1,
+        "location": "specific neighbourhood/area",
+        "price_per_night_inr": <number between 700-2500>,
+        "nights_stay": <number of nights staying in this hotel>,
+        "total_cost_inr": <price_per_night * nights_stay>,
+        "amenities": ["AC", "WiFi", "Hot Water", "24hr Checkout"],
+        "why_recommended": "Good value, clean rooms, well-rated on OYO or MakeMyTrip"
+      }
+    ],
     "transport": {
       "vehicle_type": "Hatchback",
       "recommended_models": "Maruti Swift / Hyundai i20 / Tata Tiago",
@@ -99,7 +108,7 @@ Return a JSON object with this exact structure (fill in all real values):
       "includes_driver": true,
       "rental_suggestions": "Book via Ola outstation, local taxi operators, or Zoomcar"
     },
-    "total_stay_cost_inr": <same as hotel total>,
+    "total_stay_cost_inr": <sum of all hotels total_cost_inr>,
     "total_transport_cost_inr": <same as transport total>,
     "grand_total_inr": <stay + transport>,
     "cost_notes": "Budget-friendly option with good value for money"
@@ -110,13 +119,18 @@ Return a JSON object with this exact structure (fill in all real values):
 }
 
 IMPORTANT RULES:
-- Use REAL hotel names that actually exist at the destination
-- hotel total_stay_cost_inr = price_per_night_inr x (duration_days - 1) because last day is checkout
+- Use REAL hotel names that actually exist at each destination city
+- MULTI-CITY TOURS: If the trip spans multiple cities (e.g., Rajasthan circuit: Jaipur, Jodhpur, Jaisalmer, Udaipur), the "hotels" array MUST contain one entry per city the traveler actually stays overnight in. Distribute nights_stay logically based on the itinerary (match where the traveler sleeps each night).
+- SINGLE-CITY TOURS: The "hotels" array should contain exactly one entry for the base city.
+- Sum of all nights_stay across the hotels array MUST equal (duration_days - 1) because the last day is checkout (no overnight stay).
+- Each hotel's total_cost_inr = price_per_night_inr x nights_stay
+- plan.total_stay_cost_inr = sum of every hotel's total_cost_inr in that plan
 - transport total = price_per_day x duration_days
 - grand_total = total_stay + total_transport
 - itinerary array must have exactly duration_days entries (one per day)
 - All numbers must be actual integers/floats, NOT strings
 - Google ratings must be between 3.5 and 5.0
+- For a multi-city plan, premium_plan.hotels and budget_plan.hotels MUST have the SAME list of cities in the SAME order with IDENTICAL nights_stay per city (only the hotel name/price/rating changes).
 """
 
 

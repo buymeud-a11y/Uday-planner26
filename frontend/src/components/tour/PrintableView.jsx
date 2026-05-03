@@ -42,6 +42,24 @@ const CostBox = ({ label, total, bg = "#D96B42" }) => (
 
 const PlanSection = ({ plan, type }) => {
   const isPremium = type === "premium";
+
+  // Normalize hotels: support new array format OR legacy single-hotel format
+  const hotelsList = Array.isArray(plan?.hotels) && plan.hotels.length > 0
+    ? plan.hotels
+    : plan?.hotel
+      ? [{
+          city: plan.hotel.city,
+          name: plan.hotel.name,
+          stars: plan.hotel.stars,
+          google_rating: plan.hotel.google_rating,
+          location: plan.hotel.location,
+          price_per_night_inr: plan.hotel.price_per_night_inr,
+          nights_stay: null,
+          total_cost_inr: plan.hotel.total_stay_cost_inr,
+          amenities: plan.hotel.amenities,
+        }]
+      : [];
+
   return (
     <div style={{ marginBottom: "20px" }}>
       <div
@@ -61,55 +79,76 @@ const PlanSection = ({ plan, type }) => {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-        {/* Hotel */}
-        <div style={{ border: "1px solid #E5DFD3", borderRadius: "8px", padding: "12px" }}>
-          <p style={{ margin: "0 0 4px", fontSize: "11px", color: "#75837A", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-            Accommodation
-          </p>
-          <p style={{ margin: "0 0 4px", fontWeight: "bold", fontSize: "13px", color: "#1C3325" }}>
-            {plan?.hotel?.name}
-          </p>
-          <p style={{ margin: "0 0 2px", fontSize: "11px", color: "#D99C42" }}>
-            {stars(plan?.hotel?.stars)} &nbsp; Google: {plan?.hotel?.google_rating}/5
-          </p>
-          <p style={{ margin: "0 0 2px", fontSize: "11px", color: "#4A5A50" }}>
-            {plan?.hotel?.location}
-          </p>
-          <p style={{ margin: "0 0 2px", fontSize: "11px", color: "#4A5A50" }}>
-            Per night: {fmt(plan?.hotel?.price_per_night_inr)}
-          </p>
-          <p style={{ margin: "0", fontSize: "12px", fontWeight: "bold", color: "#1C3325" }}>
-            Total stay: {fmt(plan?.hotel?.total_stay_cost_inr)}
-          </p>
-          {plan?.hotel?.amenities?.length > 0 && (
-            <p style={{ margin: "4px 0 0", fontSize: "10px", color: "#75837A" }}>
-              {plan.hotel.amenities.join(" · ")}
+      {/* Hotels section */}
+      <div style={{ border: "1px solid #E5DFD3", borderRadius: "8px", padding: "12px", marginBottom: "12px" }}>
+        <p style={{ margin: "0 0 8px", fontSize: "11px", color: "#75837A", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+          Accommodation{hotelsList.length > 1 ? ` · ${hotelsList.length} Stays` : ""}
+        </p>
+        {hotelsList.map((h, idx) => (
+          <div
+            key={idx}
+            style={{
+              paddingBottom: "8px",
+              marginBottom: idx < hotelsList.length - 1 ? "8px" : 0,
+              borderBottom: idx < hotelsList.length - 1 ? "1px dashed #E5DFD3" : "none",
+            }}
+          >
+            {h.city && hotelsList.length > 1 && (
+              <p style={{ margin: "0 0 3px", fontSize: "11px", fontWeight: "bold", color: "#D96B42", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                {h.city}
+                {h.nights_stay ? ` · ${h.nights_stay} night${h.nights_stay === 1 ? "" : "s"}` : ""}
+              </p>
+            )}
+            <p style={{ margin: "0 0 3px", fontWeight: "bold", fontSize: "13px", color: "#1C3325" }}>
+              {h.name}
             </p>
-          )}
-        </div>
+            <p style={{ margin: "0 0 2px", fontSize: "11px", color: "#D99C42" }}>
+              {stars(h.stars)} &nbsp; Google: {h.google_rating}/5
+            </p>
+            {h.location && (
+              <p style={{ margin: "0 0 2px", fontSize: "11px", color: "#4A5A50" }}>{h.location}</p>
+            )}
+            <p style={{ margin: "0 0 2px", fontSize: "11px", color: "#4A5A50" }}>
+              Per night: {fmt(h.price_per_night_inr)}
+              {h.nights_stay ? ` · ${h.nights_stay} night${h.nights_stay === 1 ? "" : "s"}` : ""}
+            </p>
+            <p style={{ margin: "0", fontSize: "12px", fontWeight: "bold", color: "#1C3325" }}>
+              Subtotal: {fmt(h.total_cost_inr)}
+            </p>
+            {h.amenities?.length > 0 && (
+              <p style={{ margin: "4px 0 0", fontSize: "10px", color: "#75837A" }}>
+                {h.amenities.join(" · ")}
+              </p>
+            )}
+          </div>
+        ))}
+        {hotelsList.length > 1 && (
+          <p style={{ margin: "8px 0 0", fontSize: "12px", fontWeight: "bold", color: "#1C3325", textAlign: "right" }}>
+            Total stay: {fmt(plan?.total_stay_cost_inr)}
+          </p>
+        )}
+      </div>
 
-        {/* Transport */}
-        <div style={{ border: "1px solid #E5DFD3", borderRadius: "8px", padding: "12px" }}>
-          <p style={{ margin: "0 0 4px", fontSize: "11px", color: "#75837A", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-            Transportation
-          </p>
-          <p style={{ margin: "0 0 4px", fontWeight: "bold", fontSize: "13px", color: "#1C3325" }}>
-            {plan?.transport?.vehicle_type}
-          </p>
-          <p style={{ margin: "0 0 2px", fontSize: "11px", color: "#4A5A50" }}>
-            {plan?.transport?.recommended_models}
-          </p>
-          <p style={{ margin: "0 0 2px", fontSize: "11px", color: "#4A5A50" }}>
-            Per day: {fmt(plan?.transport?.price_per_day_inr)}
-          </p>
-          <p style={{ margin: "0", fontSize: "12px", fontWeight: "bold", color: "#1C3325" }}>
-            Total transport: {fmt(plan?.transport?.total_transport_cost_inr)}
-          </p>
-          <p style={{ margin: "4px 0 0", fontSize: "10px", color: "#75837A" }}>
-            {plan?.transport?.includes_driver ? "Driver included" : "Self-drive"}
-          </p>
-        </div>
+      {/* Transport */}
+      <div style={{ border: "1px solid #E5DFD3", borderRadius: "8px", padding: "12px" }}>
+        <p style={{ margin: "0 0 4px", fontSize: "11px", color: "#75837A", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+          Transportation
+        </p>
+        <p style={{ margin: "0 0 4px", fontWeight: "bold", fontSize: "13px", color: "#1C3325" }}>
+          {plan?.transport?.vehicle_type}
+        </p>
+        <p style={{ margin: "0 0 2px", fontSize: "11px", color: "#4A5A50" }}>
+          {plan?.transport?.recommended_models}
+        </p>
+        <p style={{ margin: "0 0 2px", fontSize: "11px", color: "#4A5A50" }}>
+          Per day: {fmt(plan?.transport?.price_per_day_inr)}
+        </p>
+        <p style={{ margin: "0", fontSize: "12px", fontWeight: "bold", color: "#1C3325" }}>
+          Total transport: {fmt(plan?.transport?.total_transport_cost_inr)}
+        </p>
+        <p style={{ margin: "4px 0 0", fontSize: "10px", color: "#75837A" }}>
+          {plan?.transport?.includes_driver ? "Driver included" : "Self-drive"}
+        </p>
       </div>
 
       <CostBox

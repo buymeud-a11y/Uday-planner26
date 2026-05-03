@@ -56,6 +56,25 @@ const PlanCard = ({ plan, destination, duration, type }) => {
   if (!plan) return null;
   const isPremium = type === "premium";
 
+  // Normalize: support new multi-hotel array OR legacy single hotel object
+  const hotelsList = Array.isArray(plan.hotels) && plan.hotels.length > 0
+    ? plan.hotels
+    : plan.hotel
+      ? [{
+          city: plan.hotel.city || destination,
+          name: plan.hotel.name,
+          stars: plan.hotel.stars,
+          google_rating: plan.hotel.google_rating,
+          location: plan.hotel.location,
+          price_per_night_inr: plan.hotel.price_per_night_inr,
+          nights_stay: Math.max(0, (duration || 1) - 1),
+          total_cost_inr: plan.hotel.total_stay_cost_inr,
+          amenities: plan.hotel.amenities,
+          why_recommended: plan.hotel.why_recommended,
+        }]
+      : [];
+  const isMultiCity = hotelsList.length > 1;
+
   const cardBg = isPremium ? "#0C3D20" : "#FFFFFF";
   const textPrimary = isPremium ? "#FFFFFF" : "#1C3325";
   const textSecondary = isPremium ? "rgba(255,255,255,0.78)" : "#4A5A50";
@@ -109,57 +128,107 @@ const PlanCard = ({ plan, destination, duration, type }) => {
                   <Hotel size={16} style={{ color: isPremium ? "#D99C42" : "#D96B42" }} strokeWidth={1.5} />
                 </div>
                 <h3 className="text-lg font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>
-                  Accommodation
+                  Accommodation{isMultiCity ? ` · ${hotelsList.length} Stays` : ""}
                 </h3>
               </div>
 
-              <HotelImageSection isPremium={isPremium} />
+              {!isMultiCity && <HotelImageSection isPremium={isPremium} />}
 
-              <div className="mb-3">
-                <div className="flex items-center justify-between mb-1">
-                  <h4 className="text-base font-semibold" style={{ fontFamily: "Outfit, sans-serif" }}>
-                    {plan.hotel?.name}
-                  </h4>
-                  <div className="flex gap-0.5">
-                    {Array.from({ length: plan.hotel?.stars || 0 }).map((_, i) => (
-                      <Star key={i} size={11} fill="#D99C42" stroke="#D99C42" />
-                    ))}
-                  </div>
-                </div>
-                <StarRating rating={plan.hotel?.google_rating} dark={isPremium} />
-                {plan.hotel?.location && (
-                  <div className="flex items-center gap-1 mt-2">
-                    <MapPin size={12} style={{ color: isPremium ? "rgba(255,255,255,0.6)" : "#D96B42" }} />
-                    <span className="text-xs" style={{ color: textSecondary }}>{plan.hotel.location}</span>
-                  </div>
-                )}
-              </div>
+              <div className="space-y-5">
+                {hotelsList.map((h, idx) => (
+                  <div
+                    key={idx}
+                    data-testid={`hotel-entry-${type}-${idx}`}
+                    style={
+                      isMultiCity
+                        ? {
+                            background: sectionBg,
+                            border: `1px solid ${borderColor}`,
+                            borderRadius: "14px",
+                            padding: "16px",
+                          }
+                        : {}
+                    }
+                  >
+                    {isMultiCity && h.city && (
+                      <div className="flex items-center gap-2 mb-3">
+                        <span
+                          className="text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1"
+                          style={{
+                            background: isPremium ? "#D99C42" : "#D96B42",
+                            color: "#fff",
+                            fontFamily: "Manrope, sans-serif",
+                            letterSpacing: "0.05em",
+                          }}
+                        >
+                          <MapPin size={11} /> {h.city}
+                        </span>
+                        <span className="text-xs font-semibold" style={{ color: textSecondary }}>
+                          · {h.nights_stay || 0} night{(h.nights_stay || 0) === 1 ? "" : "s"}
+                        </span>
+                      </div>
+                    )}
 
-              {plan.hotel?.why_recommended && (
-                <p className="text-sm leading-relaxed mb-4 p-3 rounded-xl italic"
-                  style={{ background: sectionBg, color: textSecondary }}>
-                  "{plan.hotel.why_recommended}"
-                </p>
-              )}
+                    <div className="mb-2">
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="text-base font-semibold" style={{ fontFamily: "Outfit, sans-serif" }}>
+                          {h.name}
+                        </h4>
+                        <div className="flex gap-0.5">
+                          {Array.from({ length: h.stars || 0 }).map((_, i) => (
+                            <Star key={i} size={11} fill="#D99C42" stroke="#D99C42" />
+                          ))}
+                        </div>
+                      </div>
+                      <StarRating rating={h.google_rating} dark={isPremium} />
+                      {h.location && (
+                        <div className="flex items-center gap-1 mt-2">
+                          <MapPin size={12} style={{ color: isPremium ? "rgba(255,255,255,0.6)" : "#D96B42" }} />
+                          <span className="text-xs" style={{ color: textSecondary }}>{h.location}</span>
+                        </div>
+                      )}
+                    </div>
 
-              {plan.hotel?.amenities?.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {plan.hotel.amenities.map((a, i) => (
-                    <span
-                      key={i}
-                      className="text-xs px-3 py-1 rounded-full flex items-center gap-1"
-                      style={{ background: tagBg, color: tagText }}
+                    {h.why_recommended && (
+                      <p
+                        className="text-sm leading-relaxed mb-3 p-3 rounded-xl italic"
+                        style={{ background: isMultiCity ? (isPremium ? "rgba(0,0,0,0.2)" : "#fff") : sectionBg, color: textSecondary }}
+                      >
+                        "{h.why_recommended}"
+                      </p>
+                    )}
+
+                    {h.amenities?.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mb-3">
+                        {h.amenities.map((a, i) => (
+                          <span
+                            key={i}
+                            className="text-xs px-3 py-1 rounded-full flex items-center gap-1"
+                            style={{ background: tagBg, color: tagText }}
+                          >
+                            <CheckCircle size={9} style={{ color: isPremium ? "#D99C42" : "#D96B42" }} />
+                            {a}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    <div
+                      className="rounded-xl p-3"
+                      style={{
+                        background: isMultiCity ? (isPremium ? "rgba(0,0,0,0.2)" : "#fff") : sectionBg,
+                        border: `1px solid ${borderColor}`,
+                      }}
                     >
-                      <CheckCircle size={9} style={{ color: isPremium ? "#D99C42" : "#D96B42" }} />
-                      {a}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              <div className="rounded-xl p-4" style={{ background: sectionBg, border: `1px solid ${borderColor}` }}>
-                <CostRow label="Per Night" value={plan.hotel?.price_per_night_inr} dark={isPremium} />
-                <CostRow label={`Total Stay (${(duration || 1) - 1} nights)`} value={plan.hotel?.total_stay_cost_inr} dark={isPremium} />
+                      <CostRow label="Per Night" value={h.price_per_night_inr} dark={isPremium} />
+                      <CostRow
+                        label={`${h.nights_stay || 0} night${(h.nights_stay || 0) === 1 ? "" : "s"} stay`}
+                        value={h.total_cost_inr}
+                        dark={isPremium}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
