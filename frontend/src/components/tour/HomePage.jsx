@@ -102,6 +102,7 @@ const HomePage = () => {
   const handleReset = () => {
     setTourData(null);
     setError(null);
+    setFormData({ place: "", days: "", budget: "" });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
