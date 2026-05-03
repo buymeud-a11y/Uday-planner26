@@ -1,0 +1,37 @@
+{
+  "summary": "Tested new History feature end-to-end. All features working correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "History feature fully verified. All 6 plans load, old Goa records show '—' gracefully, nav works, View Plan links correct.",
+  "test_results": {
+    "nav_history_on_hero": "PASS - data-testid='nav-history' present top-right",
+    "history_nav_click": "PASS - navigates to /history",
+    "header_dark_green": "PASS - rgb(28, 51, 37)",
+    "your_travel_history_label": "PASS",
+    "recently_planned_tours_title": "PASS",
+    "plan_count_text": "PASS - '6 tours planned · Click any card to view the full itinerary'",
+    "history_grid_cards": "PASS - 6 cards shown (Manali x2, Goa x4)",
+    "day_badge": "PASS - 2 Days, 3 Days visible on cards",
+    "premium_budget_costs": "PASS - Manali cards show ₹22,000/₹6,600 and ₹21,000/₹6,000",
+    "old_goa_records_dash": "PASS - old records show '—' for premium and budget",
+    "view_plan_button": "PASS - href=/?plan={plan_id}",
+    "back_to_planner": "PASS - navigates to /",
+    "api_history_endpoint": "PASS - returns 6 records with plan_id, destination, days, premium_total, budget_total, highlights",
+    "plan_new_trip_button": "PASS - visible at bottom of grid"
+  }
+}

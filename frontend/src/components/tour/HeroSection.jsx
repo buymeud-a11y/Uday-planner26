@@ -1,5 +1,6 @@
 import React from "react";
-import { MapPin, Calendar, Wallet, Plane } from "lucide-react";
+import { Link } from "react-router-dom";
+import { MapPin, Calendar, Wallet, Plane, History } from "lucide-react";
 
 const HeroSection = ({ formData, setFormData, onGenerate, error, loading }) => {
   const handleKeyDown = (e) => {
@@ -20,6 +21,32 @@ const HeroSection = ({ formData, setFormData, onGenerate, error, loading }) => {
         className="absolute inset-0"
         style={{ background: "linear-gradient(135deg, rgba(28,51,37,0.88) 0%, rgba(28,51,37,0.65) 60%, rgba(28,51,37,0.5) 100%)" }}
       />
+
+      {/* Top nav bar */}
+      <nav className="absolute top-0 left-0 right-0 z-20 px-6 py-5">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Plane size={18} style={{ color: "#D96B42" }} strokeWidth={1.5} />
+            <span className="text-white font-bold text-sm" style={{ fontFamily: "Manrope, sans-serif" }}>
+              Plan &amp; Tour
+            </span>
+          </div>
+          <Link
+            to="/history"
+            className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-full transition-all duration-200 hover:-translate-y-0.5"
+            style={{
+              background: "rgba(255,255,255,0.15)",
+              color: "white",
+              backdropFilter: "blur(8px)",
+              fontFamily: "Manrope, sans-serif",
+            }}
+            data-testid="nav-history"
+          >
+            <History size={14} strokeWidth={1.5} />
+            History
+          </Link>
+        </div>
+      </nav>
 
       <div className="relative z-10 w-full px-4 py-16 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">

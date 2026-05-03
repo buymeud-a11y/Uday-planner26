@@ -208,8 +208,23 @@ async def get_shared_plan(plan_id: str):
 
 @api_router.get("/tour/history")
 async def get_tour_history():
-    plans = await db.tour_plans.find({}, {"_id": 0}).to_list(20)
-    return plans
+    docs = await db.tour_plans.find({}).sort("created_at", -1).to_list(20)
+    result = []
+    for doc in docs:
+        td = doc.get("tour_data") or {}
+        result.append({
+            "plan_id": doc.get("plan_id"),
+            "destination": doc.get("destination") or td.get("destination", "Unknown"),
+            "state_country": td.get("state_country", ""),
+            "days": doc.get("days"),
+            "budget": doc.get("budget"),
+            "created_at": doc.get("created_at"),
+            "premium_total": (td.get("premium_plan") or {}).get("grand_total_inr"),
+            "budget_total": (td.get("budget_plan") or {}).get("grand_total_inr"),
+            "highlights": (td.get("highlights") or [])[:3],
+            "overview": td.get("overview", "")[:130],
+        })
+    return result
 
 
 app.include_router(api_router)
