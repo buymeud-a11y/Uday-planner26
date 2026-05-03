@@ -120,6 +120,56 @@ IMPORTANT RULES:
 """
 
 
+def extract_json_robust(text: str) -> dict:
+    """Robustly extract valid JSON from AI response, handling markdown and partial outputs."""
+    text = text.strip()
+
+    # Strip markdown code fences
+    if "```json" in text:
+        text = text.split("```json")[1].split("```")[0].strip()
+    elif "```" in text:
+        text = text.split("```")[1].split("```")[0].strip()
+
+    # Direct parse attempt
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+
+    # Find start of JSON object
+    start = text.find("{")
+    if start == -1:
+        raise json.JSONDecodeError("No JSON object found", text, 0)
+
+    # Use JSONDecoder.raw_decode to get first complete JSON object
+    try:
+        obj, _ = json.JSONDecoder().raw_decode(text, start)
+        return obj
+    except json.JSONDecodeError:
+        pass
+
+    # Fallback: find matching braces manually to recover truncated JSON
+    depth, in_string, escape = 0, False, False
+    for i, c in enumerate(text[start:], start):
+        if escape:
+            escape = False
+            continue
+        if c == "\\" and in_string:
+            escape = True
+            continue
+        if c == '"' and not escape:
+            in_string = not in_string
+        if not in_string:
+            if c == "{":
+                depth += 1
+            elif c == "}":
+                depth -= 1
+                if depth == 0:
+                    return json.loads(text[start:i + 1])
+
+    raise json.JSONDecodeError("Could not extract valid JSON from response", text, start)
+
+
 class TourRequest(BaseModel):
     place: str = Field(min_length=2, max_length=100)
     days: int = Field(ge=1, le=30)
@@ -138,38 +188,52 @@ async def generate_tour_plan(request: TourRequest):
         if not emergent_key:
             raise HTTPException(status_code=500, detail="AI service not configured. Please add EMERGENT_LLM_KEY to backend .env")
 
-        chat = LlmChat(
-            api_key=emergent_key,
-            session_id=str(uuid.uuid4()),
-            system_message=TOUR_SYSTEM_PROMPT
-        ).with_model("openai", "gpt-4.1-nano")
+        # Use gpt-4.1-mini for reliable long JSON output (handles 7+ day plans without truncation)
+        model = "gpt-4.1-mini"
 
-        user_text = f"Create a detailed {request.days}-day tour plan for {request.place}."
+        base_user_text = f"Create a detailed {request.days}-day tour plan for {request.place}."
         if request.budget:
-            user_text += f" The traveler's total budget is approximately Rs.{request.budget:,.0f} INR."
-        user_text += " Provide specific real hotel names, realistic current INR pricing, and a practical engaging day-by-day itinerary."
+            base_user_text += f" The traveler's total budget is approximately Rs.{request.budget:,.0f} INR."
+        base_user_text += " Provide specific real hotel names, realistic current INR pricing, and a practical day-by-day itinerary."
 
-        logger.info(f"Generating tour plan for: {request.place}, {request.days} days")
-        user_msg = UserMessage(text=user_text)
-        response = await chat.send_message(user_msg)
+        logger.info(f"Generating tour plan for: {request.place}, {request.days} days, model: {model}")
 
-        # Extract JSON from response (handle markdown code blocks)
-        json_str = response.strip()
-        if '```json' in json_str:
-            json_str = json_str.split('```json')[1].split('```')[0].strip()
-        elif '```' in json_str:
-            json_str = json_str.split('```')[1].split('```')[0].strip()
+        response = None
+        tour_data = None
+        last_error = None
 
-        # Find the outermost JSON object
-        start = json_str.find('{')
-        end = json_str.rfind('}') + 1
-        if start != -1 and end > start:
-            json_str = json_str[start:end]
+        for attempt in range(2):
+            try:
+                chat = LlmChat(
+                    api_key=emergent_key,
+                    session_id=str(uuid.uuid4()),
+                    system_message=TOUR_SYSTEM_PROMPT
+                ).with_model("openai", model)
 
-        tour_data = json.loads(json_str)
+                # On retry, ask for shorter descriptions to avoid token limit
+                if attempt == 0:
+                    user_text = base_user_text
+                else:
+                    logger.warning(f"Retrying with compact format (attempt {attempt + 1})")
+                    user_text = (
+                        base_user_text +
+                        " IMPORTANT: Keep all activity descriptions very concise (under 15 words each)."
+                        " Return complete valid JSON only. No truncation."
+                    )
+
+                response = await chat.send_message(UserMessage(text=user_text))
+                tour_data = extract_json_robust(response)
+                break  # success
+
+            except (json.JSONDecodeError, ValueError) as e:
+                last_error = e
+                logger.error(f"Attempt {attempt + 1} JSON parse error: {e}. Response snippet: {response[:300] if response else 'N/A'}")
+                if attempt == 1:
+                    raise HTTPException(status_code=500, detail="Failed to parse AI response after 2 attempts. Please try again.")
+
         logger.info(f"Tour plan generated successfully for: {request.place}")
 
-        # Save to MongoDB (including full tour_data for sharing)
+        # Save to MongoDB
         plan_id = str(uuid.uuid4())
         doc = {
             "plan_id": plan_id,
@@ -182,13 +246,9 @@ async def generate_tour_plan(request: TourRequest):
         }
         await db.tour_plans.insert_one(doc)
 
-        # Include plan_id in response so frontend can build share URL
         tour_data["plan_id"] = plan_id
         return tour_data
 
-    except json.JSONDecodeError as e:
-        logger.error(f"JSON parsing error: {e}")
-        raise HTTPException(status_code=500, detail="Failed to parse AI response. Please try again.")
     except HTTPException:
         raise
     except Exception as e:
