@@ -11,7 +11,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime, timezone
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+import google.generativeai as genai
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -218,11 +218,12 @@ async def generate_tour_plan(request: TourRequest):
 
         for attempt in range(2):
             try:
-                chat = LlmChat(
-                    api_key=emergent_key,
-                    session_id=str(uuid.uuid4()),
-                    system_message=TOUR_SYSTEM_PROMPT
-                ).with_model("openai", model)
+                genai.configure(api_key=os.environ.get( 'GEMINI_API_KEY'))
+                model_client = genai.GenerativeModel(
+                    model_name=os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash'),
+                    system_instruction=TOUR_SYSTEM_PROMPT
+                )
+                
 
                 # On retry, ask for shorter descriptions to avoid token limit
                 if attempt == 0:
@@ -235,8 +236,8 @@ async def generate_tour_plan(request: TourRequest):
                         " Return complete valid JSON only. No truncation."
                     )
 
-                response = await chat.send_message(UserMessage(text=user_text))
-                tour_data = extract_json_robust(response)
+                response =                 model_client.generate_content(user_text)
+                tour_data =                 extract_json_robust(response.text)
                 break  # success
 
             except (json.JSONDecodeError, ValueError) as e:
