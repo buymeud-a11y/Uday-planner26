@@ -11,7 +11,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime, timezone
-import google.generativeai as genai
+from groq import Groq
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -198,12 +198,12 @@ async def root():
 @api_router.post("/tour/generate")
 async def generate_tour_plan(request: TourRequest):
     try:
-        emergent_key = os.environ.get('EMERGENT_LLM_KEY')
-        if not emergent_key:
-            raise HTTPException(status_code=500, detail="AI service not configured. Please add EMERGENT_LLM_KEY to backend .env")
+        groq_api_key = os.environ.get('GROQ_API_KEY')
+        if not groq_api_key:
+            raise HTTPException(status_code=500, detail="AI service not configured. Please add GROQ_API_KEY to environment variables.")
 
-        # Use gpt-4.1-mini for reliable long JSON output (handles 7+ day plans without truncation)
-        model = "gpt-4.1-mini"
+        groq_client = Groq(api_key=groq_api_key)
+        model = "llama-3.3-70b-versatile"
 
         base_user_text = f"Create a detailed {request.days}-day tour plan for {request.place}."
         if request.budget:
@@ -212,19 +212,11 @@ async def generate_tour_plan(request: TourRequest):
 
         logger.info(f"Generating tour plan for: {request.place}, {request.days} days, model: {model}")
 
-        response = None
         tour_data = None
         last_error = None
 
         for attempt in range(2):
             try:
-                genai.configure(api_key=os.environ.get( 'GEMINI_API_KEY'))
-                model_client = genai.GenerativeModel(
-                    model_name=os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash'),
-                    system_instruction=TOUR_SYSTEM_PROMPT
-                )
-                
-
                 # On retry, ask for shorter descriptions to avoid token limit
                 if attempt == 0:
                     user_text = base_user_text
@@ -236,13 +228,23 @@ async def generate_tour_plan(request: TourRequest):
                         " Return complete valid JSON only. No truncation."
                     )
 
-                response =                 model_client.generate_content(user_text)
-                tour_data =                 extract_json_robust(response.text)
+                chat_completion = groq_client.chat.completions.create(
+                    model=model,
+                    messages=[
+                        {"role": "system", "content": TOUR_SYSTEM_PROMPT},
+                        {"role": "user", "content": user_text}
+                    ],
+                    max_tokens=8000,
+                    temperature=0.7
+                )
+
+                response_text = chat_completion.choices[0].message.content
+                tour_data = extract_json_robust(response_text)
                 break  # success
 
             except (json.JSONDecodeError, ValueError) as e:
                 last_error = e
-                logger.error(f"Attempt {attempt + 1} JSON parse error: {e}. Response snippet: {response[:300] if response else 'N/A'}")
+                logger.error(f"Attempt {attempt + 1} JSON parse error: {e}")
                 if attempt == 1:
                     raise HTTPException(status_code=500, detail="Failed to parse AI response after 2 attempts. Please try again.")
 
