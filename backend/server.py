@@ -114,6 +114,13 @@ Return a JSON object with this exact structure (fill in all real values):
     "cost_notes": "Budget-friendly option with good value for money"
   },
   "travel_tips": ["Practical tip 1", "Practical tip 2", "Practical tip 3", "Practical tip 4"],
+  "international_essentials": {
+    "visa_requirements_for_indians": "e.g., E-visa required / Visa on arrival / Schengen required",
+    "local_currency": "e.g., Euro (EUR)",
+    "exchange_rate_estimate_inr": "e.g., 1 EUR ≈ 90 INR",
+    "emergency_numbers": "e.g., Police: 112, Ambulance: 15",
+    "cultural_etiquette": "Short cultural tip for Indian travelers"
+  },
   "estimated_total_food_cost_inr": <total food cost for all days>,
   "currency": "INR"
 }
@@ -188,6 +195,9 @@ class TourRequest(BaseModel):
     place: str = Field(min_length=2, max_length=100)
     days: int = Field(ge=1, le=30)
     budget: Optional[float] = None
+
+class TranslationRequest(BaseModel):
+    text: str
 
 
 @api_router.get("/")
@@ -313,6 +323,33 @@ async def get_tour_history():
             "overview": td.get("overview", "")[:130],
         })
     return result
+
+
+@api_router.post("/tour/translate")
+async def translate_text(request: TranslationRequest):
+    """Extremely fast, free-tier translation using Groq."""
+    groq_api_key = os.environ.get("GROQ_API_KEY")
+    if not groq_api_key:
+        raise HTTPException(status_code=500, detail="AI service not configured.")
+    
+    groq_client = Groq(api_key=groq_api_key)
+    # Using a fast, lightweight model to save tokens and reduce latency
+    model = "llama3-8b-8192" 
+    
+    try:
+        chat_completion = groq_client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": "You are a fast, accurate translator. Translate the user's foreign text into English. Respond ONLY with the translation, nothing else."},
+                {"role": "user", "content": request.text}
+            ],
+            max_tokens=200,
+            temperature=0.3,
+        )
+        return {"translation": chat_completion.choices[0].message.content.strip()}
+    except Exception as e:
+        logger.error(f"Translation error: {e}")
+        raise HTTPException(status_code=500, detail="Translation failed.")
 
 
 app.include_router(api_router)
