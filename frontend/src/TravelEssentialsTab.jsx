@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { ShieldAlert, CheckCircle2, Info, Smartphone, Bus, Briefcase, Phone, Landmark, Languages, CloudSun, Wallet, Loader2 } from "lucide-react";
 
 const TravelEssentialsTab = ({ tourData }) => {
-  const essentials = tourData.international_essentials || {};
+ const essentials = useMemo(() => tourData.international_essentials || {}, [tourData.international_essentials]);
   
   // Real-time states
   const [liveWeather, setLiveWeather] = useState("Loading weather...");
