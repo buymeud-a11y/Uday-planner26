@@ -168,7 +168,7 @@ async def translate_text(request: TranslationRequest):
     groq_client = Groq(api_key=groq_api_key)
     try:
         chat_completion = groq_client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="openai/gpt-oss-120b",
             messages=[{"role": "system", "content": "You are a fast, accurate translator. Translate the user's foreign text into English. Respond ONLY with the translation, nothing else."}, {"role": "user", "content": request.text}],
             max_tokens=200, temperature=0.3
         )
