@@ -1,19 +1,22 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { Map, Crown, Tag, RefreshCw, Share2, Check, Download } from "lucide-react";
+import { Map, Crown, Tag, RefreshCw, Share2, Check, Download, Globe } from "lucide-react";
 import HeroSection from "./HeroSection";
 import TourPlanSection from "./TourPlanSection";
 import PlanCard from "./PlanCard";
 import LoadingState from "./LoadingState";
 import PrintableView from "./PrintableView";
+import TravelEssentialsTab from "@/TravelEssentialsTab"; // Importing your new tab!
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Added the 4th tab for Travel Essentials
 const tabs = [
   { id: "plan", label: "Tour Plan", Icon: Map, color: "#0891B2" },
   { id: "premium", label: "Premium Tour", Icon: Crown, color: "#D97706" },
   { id: "budget", label: "Budget Tour", Icon: Tag, color: "#16A34A" },
+  { id: "essentials", label: "Travel Essentials", Icon: Globe, color: "#E8580A" }, 
 ];
 
 const ResultsTabs = ({ activeTab, setActiveTab, planId, onShare, copied }) => (
@@ -49,10 +52,10 @@ const ResultsTabs = ({ activeTab, setActiveTab, planId, onShare, copied }) => (
             data-testid="btn-share"
             className="ml-auto flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-bold transition-all duration-200 whitespace-nowrap hover:-translate-y-0.5"
             style={{
-              background: copied ? "#16A34A" : "#E8580A",
+              background: copied ? "#16A34A" : "#1C3325",
               color: "#fff",
               fontFamily: "Manrope, sans-serif",
-              boxShadow: copied ? "0 4px 14px #16A34A55" : "0 4px 14px #E8580A55",
+              boxShadow: copied ? "0 4px 14px #16A34A55" : "0 4px 14px #1C332555",
             }}
           >
             {copied ? <Check size={14} strokeWidth={2} /> : <Share2 size={14} strokeWidth={1.5} />}
@@ -121,7 +124,6 @@ const HomePage = () => {
     setTourData(null);
     setPlanId(null);
 
-    // Clear any existing ?plan= from URL
     const cleanUrl = window.location.pathname;
     window.history.replaceState({}, "", cleanUrl);
 
@@ -142,7 +144,6 @@ const HomePage = () => {
       const data = response.data;
       setTourData(data);
 
-      // Update URL with plan_id for shareability
       if (data.plan_id) {
         setPlanId(data.plan_id);
         const newUrl = `${window.location.pathname}?plan=${data.plan_id}`;
@@ -161,7 +162,6 @@ const HomePage = () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
     } catch {
-      // Fallback for older browsers
       const el = document.createElement("textarea");
       el.value = shareUrl;
       document.body.appendChild(el);
@@ -194,7 +194,6 @@ const HomePage = () => {
         loading={loading}
       />
 
-      {/* Results anchor */}
       <div ref={resultsRef} />
 
       {loading && <LoadingState />}
@@ -228,8 +227,12 @@ const HomePage = () => {
               type="budget"
             />
           )}
+          
+          {/* Rendering the new Travel Essentials Tab! */}
+          {activeTab === "essentials" && (
+            <TravelEssentialsTab tourData={tourData} />
+          )}
 
-          {/* Bottom actions: Download PDF + Plan Another Trip */}
           <div className="py-8 flex flex-wrap justify-center gap-3" style={{ background: "#FDF6EE" }}>
             <button
               onClick={() => window.print()}
@@ -251,7 +254,6 @@ const HomePage = () => {
             </button>
           </div>
 
-          {/* Hidden printable view — visible only on print/PDF */}
           <PrintableView tourData={tourData} />
         </>
       )}
